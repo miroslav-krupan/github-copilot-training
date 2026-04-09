@@ -61,26 +61,26 @@ async def generate_productivity_report() -> ProductivityReport:
 app = FastAPI(title="Productivity Reporting System")
 
 @app.get("/status")
-def get_status():
+def get_status() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.get("/tasks", response_model=List[DeveloperTask])
-async def get_all_tasks():
+async def get_all_tasks() -> list[DeveloperTask]:
     """Returns a list of all logged tasks."""
     return await fetch_all_tasks()
 
 
 @app.get("/report", response_model=ProductivityReport)
-async def get_productivity_report():
+async def get_productivity_report() -> ProductivityReport:
     """Returns the calculated productivity report."""
     return await generate_productivity_report()
 
 
 @app.post("/log_task")
-async def log_task(task: DeveloperTask):
+async def log_task(task: DeveloperTask) -> dict[str, str | int]:
     new_id = max(MOCK_TASKS.keys()) + 1 if MOCK_TASKS else 1
     task.task_id = new_id
     MOCK_TASKS[new_id] = task
     
-    return f"Task ID {task.task_id} logged successfully."
+    return {"message": "Task logged successfully.", "task_id": task.task_id}
