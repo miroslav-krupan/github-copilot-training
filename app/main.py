@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 import asyncio
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from app.models import TaskStatus, DeveloperTask, ProductivityReport
 
@@ -67,10 +67,10 @@ async def log_task(task: DeveloperTask) -> Dict[str, Any]:
 
 
 @app.get("/task/{task_id}/status")
-async def get_task_status(task_id: int) -> Dict[str, str]:
+async def get_task_status(task_id: int) -> Dict[str, Any]:
     """Returns the status of a specific task by its ID."""
     task = MOCK_TASKS.get(task_id)
-    if not task:
-        return {"error": "Task not found"}
-    
-    return {"task_id": task_id, "status": task.status.value}
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return {"task_id": task.task_id, "status": task.status.value}
