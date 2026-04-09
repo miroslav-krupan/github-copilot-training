@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 import asyncio
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from app.models import TaskStatus, DeveloperTask, ProductivityReport
 
@@ -45,32 +45,22 @@ async def get_status() -> Dict[str, str]:
 
 
 @app.get("/tasks", response_model=List[DeveloperTask])
-async def get_all_tasks():
+async def get_all_tasks() -> List[DeveloperTask]:
     """Returns a list of all logged tasks."""
     return await fetch_all_tasks()
 
 
 @app.get("/report", response_model=ProductivityReport)
-async def get_productivity_report():
+async def get_productivity_report() -> ProductivityReport:
     """Returns the calculated productivity report."""
     return await generate_productivity_report()
 
 
-@app.post("/log_task")
-async def log_task(task: DeveloperTask) -> Dict[str, Any]:
-    """Creates a new task entry, assigns it a new ID, and returns a confirmation payload."""
-    new_id = max(MOCK_TASKS.keys()) + 1 if MOCK_TASKS else 1
-    new_task = task.model_copy(update={"task_id": new_id})
-    MOCK_TASKS[new_id] = new_task
-    
-    return {"task_id": new_task.task_id, "message": "Task logged successfully."}
-
-
 @app.get("/task/{task_id}/status")
-async def get_task_status(task_id: int) -> Dict[str, str]:
+async def get_task_status(task_id: int) -> Dict[str, Any]:
     """Returns the status of a specific task by its ID."""
     task = MOCK_TASKS.get(task_id)
-    if not task:
-        return {"error": "Task not found"}
-    
-    return {"task_id": task_id, "status": task.status.value}
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return {"task_id": task.task_id, "status": task.status.value}

@@ -4,7 +4,7 @@
 This is a small RESTful API built with Python and the FastAPI framework. We prioritize clean, modern Python standards and clear separation of concerns.
 
 ## Tech Stack & Structure
-* **Primary Language:** Python 3.10+
+* **Primary Language:** Python 3.12.x
 * **Framework:** FastAPI (with Uvicorn).
 * **Dependency Manager:** uv (configured via pyproject.toml).
 * **Data Models:** Pydantic models for all data validation and serialization.
